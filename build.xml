@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MobileBanking" basedir="." default="all">
+   
+	<property environment="env" />
+	<property file="build.properties"/>
+	<property name="source.dir" value="src" />
+	<property name="web.dir" value="WebContent" />
+	<property name="war.dir" value="wars" />
+	
+	<path id="project_classpath" >
+	 <pathelement path="${web.dir}/WEB-INF/lib/servlet-api-2.5.jar"/>
+	 <pathelement path="${env.CLASSPATH}"/>
+	</path>
+	
+	<tstamp>
+	    <format property="builddatetime" pattern="yyyyMMddhhmm" locale="en,GB"/>
+	  </tstamp>
+	<target name="delete" >
+		<delete dir="${web.dir}/WEB-INF/classes" />
+<delete dir="${war.dir}" />		
+	</target>
+	
+	<target name="init" >
+		<mkdir dir="${web.dir}/WEB-INF/classes" />
+		<mkdir dir="${war.dir}" />
+		</target>
+	
+	<target name="compile" >
+		<javac srcdir="${source.dir}" destdir="${web.dir}/WEB-INF/classes" classpathref="project_classpath" >
+			
+		</javac>
+		
+		<copy todir="${web.dir}/WEB-INF/classes" >
+		    <fileset dir="${source.dir}">
+		      <exclude name="**/*.java"/>
+		    </fileset>
+		</copy>
+	</target>
+	
+	<target name="package" >
+		<war basedir="${web.dir}" destfile="${war.dir}/webapp.war"/>
+		</target>
+
+	<!-- <target name="all" depends="delete,init,compile_project,package" /> -->
+	
+	<target name="all" >
+	  <antcall target="delete" />
+		<antcall target="init" />
+		<antcall target="compile" />
+		<antcall target="package" />
+	</target>
+	
+	<target name="exe_deploy" >
+	 <ant antfile="deploy.xml" target="deploy"/>
+	</target>
+	
+	<target name="check" >
+	  <condition property="check.war">
+	  	<available file="${war.dir}" type="dir" />
+	  </condition>
+	 <antcall target="waravailable" />
+		<antcall target="warnotavailable" />
+	</target>
+	<target name="waravailable" if="check.war">
+	 <delete dir="${war.dir}" />
+	</target>
+	<target name="warnotavailable" unless="check.war">
+		<mkdir dir="${war.dir}" />
+	</target>
+	
+	
+</project>
